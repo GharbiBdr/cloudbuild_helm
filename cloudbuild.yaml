@@ -3,7 +3,7 @@ steps:
   args: ['pull', 'stable/keel', '--untar']
   env:
   - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
-  - 'CLOUDSDK_CONTAINER_CLUSTER=your-cluster'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=test'
   dir: 'data'
 - name: 'bash'
   args: ['echo', 'I am running a bash command']
