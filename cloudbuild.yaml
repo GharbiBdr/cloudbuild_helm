@@ -9,7 +9,7 @@ steps:
 #   - 'TILLERLESS=true'
 #   - 'TILLER_NAMESPACE=test'
 - name: 'gcr.io/$PROJECT_ID/helm'
-  args: ['install', 'nginx', 'us-central1-docker.pkg.dev/sandbox-334514/quickstart-helm-repo/nginx', '--version', '0.1.0']
+  args: ['upgrade', '--install', 'nginx', 'us-central1-docker.pkg.dev/sandbox-334514/quickstart-helm-repo/nginx']
   env:
   - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
   - 'CLOUDSDK_CONTAINER_CLUSTER=test'
