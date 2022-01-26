@@ -1,13 +1,13 @@
 steps:
-- name: 'gcr.io/$PROJECT_ID/cloud-builders-helm'
-  args: ['upgrade', '--install', 'nginx1', '--namespace', 'nginx', 'stable/filebeat', '--version', '0.1.0']
-  env:
-  - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
-  - 'CLOUDSDK_CONTAINER_CLUSTER=test'
-  - 'HELM_REPO_NAME=nginx'
-  - 'HELM_REPO_URL=us-central1-docker.pkg.dev/sandbox-334514/quickstart-helm-repo'
-  - 'TILLERLESS=true'
-  - 'TILLER_NAMESPACE=test'
+# - name: 'gcr.io/$PROJECT_ID/cloud-builders-helm'
+#   args: ['upgrade', '--install', 'nginx1', '--namespace', 'nginx', 'stable/filebeat', '--version', '0.1.0']
+#   env:
+#   - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
+#   - 'CLOUDSDK_CONTAINER_CLUSTER=test'
+#   - 'HELM_REPO_NAME=nginx'
+#   - 'HELM_REPO_URL=us-central1-docker.pkg.dev/sandbox-334514/quickstart-helm-repo'
+#   - 'TILLERLESS=true'
+#   - 'TILLER_NAMESPACE=test'
 - name: 'gcr.io/$PROJECT_ID/helm'
   args: ['install', 'nginx', 'us-central1-docker.pkg.dev/sandbox-334514/quickstart-helm-repo/nginx', '--version', '0.1.0']
   env:
