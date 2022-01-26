@@ -1,7 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.name }}-deployment
+  name: nginx-deployment
+#  namespace: sidespin
   labels:
     app: nginx
 spec:

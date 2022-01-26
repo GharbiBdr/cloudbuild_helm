@@ -9,7 +9,7 @@ steps:
 #   - 'TILLERLESS=true'
 #   - 'TILLER_NAMESPACE=test'
 - name: 'gcr.io/$PROJECT_ID/helm'
-  args: ['install', 'nginx', './helm']
+  args: ['install', 'test', './helm', '--namespace', 'sidespin',]
   env:
   - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
   - 'CLOUDSDK_CONTAINER_CLUSTER=test'
