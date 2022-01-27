@@ -1,17 +1,15 @@
 steps:
 - name: 'gcr.io/$PROJECT_ID/helm'
   args: ['install', 'test', './helm', '--namespace', 'sidespin', 
-  '--set', 'pubsub=$PUBSUB',
-  '--set', 'name=$NAME'
+  '--set', 'pubsub=${_PUBSUB}',
+  '--set', 'name=${_NAME}'
   ]
 #  args: ['uninstall', 'test', '--namespace', 'sidespin']
   env:
   - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
   - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-1'
-  - 'PUBSUB=false'
-  - 'NAME=test'
-# substitutions:
-#   _PUBSUB: false
-#   _NAME: 'test'
+substitutions:
+  _PUBSUB: false
+  _NAME: 'test'
 
 tags: ['cloud-builders-community']
