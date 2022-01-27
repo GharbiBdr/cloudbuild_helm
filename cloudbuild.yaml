@@ -1,8 +1,8 @@
 steps:
 - name: 'gcr.io/$PROJECT_ID/helm'
   args: ['install', 'test', './helm', '--namespace', 'sidespin', 
-  '--set', 'pubsub=${PUBSUB}',
-  '--set', 'name=${NAME}'
+  '--set', 'pubsub=$PUBSUB',
+  '--set', 'name=$NAME'
   ]
 #  args: ['uninstall', 'test', '--namespace', 'sidespin']
   env:
