@@ -84,7 +84,7 @@ steps:
 #         done;
 #     dir: "${_REPO_NAME}"
   - name: 'gcr.io/$PROJECT_ID/helm'
-    args: ['upgrade', '--install', './helm', '--namespace', '${_TENANT_ID}', '${_DEPLOYMENT_NAME}']
+    args: ['upgrade', '--install', './helm', '--namespace', '${_TENANT_ID}', '${_DEPLOYMENT_NAME}', "--set", "pubsub", "false"]
     env:
     - 'CLOUDSDK_COMPUTE_ZONE=${_KUBERNETES_ZONE}'
     - 'CLOUDSDK_CONTAINER_CLUSTER=${_KUBERNETES_CLUSTER}'
