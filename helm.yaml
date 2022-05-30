@@ -1,0 +1,97 @@
+steps:
+  - id: "Get feature repo SSH key"
+    name: "gcr.io/cloud-builders/gcloud"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - "gcloud beta secrets versions access latest --secret=${_SSH_KEY} > /root/.ssh/id_github"
+    volumes:
+      - name: "ssh"
+        path: /root/.ssh
+
+  - id: Set up git with key and domain
+    name: "gcr.io/cloud-builders/git"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        chmod 600 /root/.ssh/id_github
+        cat <<EOF >/root/.ssh/config
+        Hostname github.com
+        IdentityFile /root/.ssh/id_github
+        EOF
+        ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
+    volumes:
+      - name: "ssh"
+        path: "/root/.ssh"
+
+  - id: "Clone repository"
+    name: "gcr.io/cloud-builders/git"
+    entrypoint: "git"
+    args:
+      - "clone"
+      - "--recurse-submodules"
+      - "ssh://git@github.com/${_REPO_USER}/${_REPO_NAME}"
+    volumes:
+      - name: "ssh"
+        path: "/root/.ssh"
+
+  - id: "Checkout on specified branch/commit"
+    name: "gcr.io/cloud-builders/git"
+    entrypoint: "git"
+    args: ["checkout", "${_TARGET}"]
+    dir: "${_REPO_NAME}"
+
+  - id: "Get feature env variables"
+    name: "gcr.io/cloud-builders/gcloud"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - "gcloud  beta secrets versions access latest --secret=${_ENV_SECRETS} > .env"
+    dir: "${_REPO_NAME}"
+
+  - id: "Get feature api module SSH key"
+    name: "gcr.io/cloud-builders/gcloud"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - "gcloud beta secrets versions access latest --secret=_FEATURE_API_MODULE_NODE_SSH > .ssh_key"
+    dir: "${_REPO_NAME}"
+
+  - id: "Get feature api service account key"
+    name: "gcr.io/cloud-builders/gcloud"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - "gcloud beta secrets versions access latest --secret=_FAPI_SERVICE_ACCOUNT_KEY > ./google_credentials.json"
+    dir: "${_REPO_NAME}"
+
+  - id: "Build docker container"
+    name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "gcr.io/${PROJECT_ID}/${_TENANT_ID}:${BUILD_ID}", "."]
+    dir: "${_REPO_NAME}"
+
+  - id: "Push image to GCR"
+    name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/${PROJECT_ID}/${_TENANT_ID}:${BUILD_ID}"]
+
+  - id: "Generate kubernetes.yaml file"
+    name: "gcr.io/cloud-builders/gcloud"
+    dir: "${_REPO_NAME}"
+    entrypoint: "/bin/sh"
+    args:
+      - "-c"
+      - 'sed "s/__IMAGE__/gcr.io\/${PROJECT_ID}\/${_TENANT_ID}:${BUILD_ID}/g; s/__NAMESPACE__/${_TENANT_ID}/g; s/__HOSTNAME__/${_DNS_NAME}/g; s/__DEPLOYMENT_NAME__/${_DEPLOYMENT_NAME}/g; " kubernetes/kubernetes.yaml.tpl > kubernetes.yaml'
+
+  - id: "Apply kubernetes.yaml"
+    name: "gcr.io/cloud-builders/kubectl"
+    args: ["apply", "-f", "kubernetes.yaml"]
+    dir: "${_REPO_NAME}"
+    env:
+      - "CLOUDSDK_COMPUTE_ZONE=${_KUBERNETES_ZONE}"
+      - "CLOUDSDK_CONTAINER_CLUSTER=${_KUBERNETES_CLUSTER}"
+
+timeout: 3600s
+options:
+  pool:
+    name: "projects/${PROJECT_ID}/locations/us-central1/workerPools/us-central-1-pool"
